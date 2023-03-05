@@ -8,7 +8,7 @@
 **/cache
 **/node_modules
 **/out
-lib/
+**/lib
 
 # files
 *.env

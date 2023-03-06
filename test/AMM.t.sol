@@ -5,13 +5,15 @@ import { PRBTest } from "@prb/test/PRBTest.sol";
 import { console2 } from "forge-std/console2.sol";
 import { StdCheats } from "forge-std/StdCheats.sol";
 
+import { Token } from "../src/Token.sol";
+
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
 }
 
 /// @dev See the "Writing Tests" section in the Foundry Book if this is your first time with Forge.
 /// https://book.getfoundry.sh/forge/writing-tests
-contract FooTest is PRBTest, StdCheats {
+contract AMMTest is PRBTest, StdCheats {
     /// @dev An optional function invoked before each test case is run
     function setUp() public {
         // solhint-disable-previous-line no-empty-blocks

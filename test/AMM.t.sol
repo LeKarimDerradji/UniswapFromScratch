@@ -5,7 +5,15 @@ import { PRBTest } from "@prb/test/PRBTest.sol";
 import { console2 } from "forge-std/console2.sol";
 import { StdCheats } from "forge-std/StdCheats.sol";
 
+import "ds-test/test.sol";
+
 import { Token } from "../src/Token.sol";
+import { AMM } from "../src/AMM.sol";
+
+interface CheatCodes {
+    // Gets address for a given private key, (privateKey) => (address)
+    function addr(uint256) external returns (address);
+}
 
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
@@ -15,12 +23,31 @@ interface IERC20 {
 /// https://book.getfoundry.sh/forge/writing-tests
 contract AMMTest is PRBTest, StdCheats {
     /// @dev An optional function invoked before each test case is run
+    Token internal token;
+    AMM internal amm;
+
+    address public user1;
+    address public user2;
+
+    CheatCodes internal cheats = CheatCodes(HEVM_ADDRESS);
+
     function setUp() public {
         // solhint-disable-previous-line no-empty-blocks
+        user1 = cheats.addr(1);
+        user2 = cheats.addr(2);
+
+        vm.prank(user1);
+        token = new Token("Token", "TKN", 1000 ether);
+        amm = new AMM(address(token));
+
+    }
+
+    function testInitBalance() external {
+        assertEq(token.balanceOf(user1), 1000 ether, "user1 did not get 1000 ether");
     }
 
     /// @dev Simple test. Run Forge with `-vvvv` to see console logs.
-    function test_Example() external {
+    function test_AddLiquidity() external {
         console2.log("Hello World");
         assertTrue(true);
     }

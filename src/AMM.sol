@@ -11,7 +11,7 @@ contract AMM {
     constructor(address tokenAddress_) {
         // check is contract
         // check is ERC20
-        if (tokenAddress_ != address(0)) revert AddressZero();
+        if (tokenAddress_ == address(0)) revert AddressZero();
 
         tokenAddress = tokenAddress_;
     }

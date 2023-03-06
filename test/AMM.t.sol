@@ -39,7 +39,6 @@ contract AMMTest is PRBTest, StdCheats {
         vm.prank(user1);
         token = new Token("Token", "TKN", 1000 ether);
         amm = new AMM(address(token));
-
     }
 
     function testInitBalance() external {
@@ -48,8 +47,12 @@ contract AMMTest is PRBTest, StdCheats {
 
     /// @dev Simple test. Run Forge with `-vvvv` to see console logs.
     function test_AddLiquidity() external {
-        console2.log("Hello World");
-        assertTrue(true);
+        vm.startPrank(user1);
+        token.approve(address(amm), type(uint256).max);
+        amm.addLiquidity(10 ether);
+        vm.stopPrank();
+        assertEq(token.balanceOf(address(amm)), 10 ether);
+        assertEq(token.balanceOf(user1), 990 ether);
     }
 
     /// @dev Test that fuzzes an unsigned integer.
@@ -58,6 +61,7 @@ contract AMMTest is PRBTest, StdCheats {
         assertGt(x, 0);
     }
 
+    /*
     /// @dev Test that runs against a fork of Ethereum Mainnet. You need to set `API_KEY_ALCHEMY` in your environment
     /// for this test to run - you can get an API key for free at https://alchemy.com.
     function testFork_Example() external {
@@ -75,4 +79,5 @@ contract AMMTest is PRBTest, StdCheats {
         uint256 expectedBalance = 196_307_713.810457e6;
         assertEq(actualBalance, expectedBalance);
     }
+    */
 }

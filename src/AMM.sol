@@ -7,7 +7,7 @@ contract AMM {
     address public tokenAddress;
 
     error AddressZero();
-    error InputReserveIsZero();
+    error InvalidReserves();
 
     constructor(address tokenAddress_) {
         // check is contract
@@ -40,7 +40,11 @@ contract AMM {
     }
 
     function getPrice(uint256 inputReserve, uint256 outputReserve) external pure returns (uint256) {
-        if (inputReserve == 0 && outputReserve == 0) revert InputReserveIsZero();
+        if (inputReserve == 0 && outputReserve == 0) revert InvalidReserves();
         return (inputReserve * 1000) / outputReserve;
+    }
+
+    function getAmount(uint256 inputReserve, uint256 outputReserve) external pure returns (uint256) {
+         if (inputReserve == 0 && outputReserve == 0) revert InvalidReserves();
     }
 }

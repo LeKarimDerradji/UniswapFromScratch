@@ -8,7 +8,7 @@ contract AMM {
 
     error AddressZero();
     error InvalidReserves();
-    error InvalidEthAmount();
+    error InvalidInputAmount();
 
     constructor(address tokenAddress_) {
         // check is contract
@@ -46,11 +46,17 @@ contract AMM {
     }
 
     function getTokenAmount(uint256 ethSold_) public view returns (uint256) {
-        if (ethSold_ == 0) revert InvalidEthAmount();
+        if (ethSold_ == 0) revert InvalidInputAmount();
 
         uint256 tokenReserve = getReserve();
 
         return getAmount(ethSold_, address(this).balance, tokenReserve);
+    }
+
+    function getEthAmount(uint256 tokenSold_) public view returns (uint256) {
+        if (tokenSold_ == 0) revert InvalidInputAmount();
+
+        return getAmount(tokenSold_, getReserve(), address(this).balance);
     }
 
     function getAmount(

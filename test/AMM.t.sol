@@ -62,7 +62,7 @@ contract AMMTest is PRBTest, StdCheats {
         amm.addLiquidity{ value: 1000 ether }(2000 ether);
         vm.stopPrank();
 
-        uint256 tokenBalance = amm.getReserves();
+        uint256 tokenBalance = amm.getReserve();
         uint256 etherBalance = address(amm).balance;
        // Eth per tokens
        assertEq(amm.getPrice(etherBalance, tokenBalance), 500);

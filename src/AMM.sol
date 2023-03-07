@@ -8,6 +8,7 @@ contract AMM {
 
     error AddressZero();
     error InvalidReserves();
+    error InvalidEthAmount();
 
     constructor(address tokenAddress_) {
         // check is contract
@@ -34,14 +35,22 @@ contract AMM {
     /*                          GETTERS                           */
     /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-    function getReserves() external view returns (uint256 tokenBalance_) {
+    function getReserve() public view returns (uint256 tokenBalance_) {
         uint256 tokenBalance = IERC20(tokenAddress).balanceOf(address(this));
         return tokenBalance;
     }
 
-    function getPrice(uint256 inputReserve, uint256 outputReserve) external pure returns (uint256) {
+    function getPrice(uint256 inputReserve, uint256 outputReserve) public pure returns (uint256) {
         if (inputReserve == 0 && outputReserve == 0) revert InvalidReserves();
         return (inputReserve * 1000) / outputReserve;
+    }
+
+    function getTokenAmount(uint256 ethSold_) public view returns (uint256) {
+        if (ethSold_ == 0) revert InvalidEthAmount();
+
+        uint256 tokenReserve = getReserve();
+
+        return getAmount(ethSold_, address(this).balance, tokenReserve);
     }
 
     function getAmount(

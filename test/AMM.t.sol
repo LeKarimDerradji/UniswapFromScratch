@@ -35,14 +35,14 @@ contract AMMTest is PRBTest, StdCheats {
         // solhint-disable-previous-line no-empty-blocks
         user1 = cheats.addr(1);
         user2 = cheats.addr(2);
-
+        vm.deal(user1, 10000 ether);
         vm.prank(user1);
-        token = new Token("Token", "TKN", 1000 ether);
+        token = new Token("Token", "TKN", 3000 ether);
         amm = new AMM(address(token));
     }
 
     function testInitBalance() external {
-        assertEq(token.balanceOf(user1), 1000 ether, "user1 did not get 1000 ether");
+        assertEq(token.balanceOf(user1), 3000 ether, "user1 did not get 3000 ether");
     }
 
     /// @dev Simple test. Run Forge with `-vvvv` to see console logs.
@@ -52,7 +52,22 @@ contract AMMTest is PRBTest, StdCheats {
         amm.addLiquidity(10 ether);
         vm.stopPrank();
         assertEq(token.balanceOf(address(amm)), 10 ether);
-        assertEq(token.balanceOf(user1), 990 ether);
+        assertEq(amm.getReserves(), 10 ether);
+        assertEq(token.balanceOf(user1), 2990 ether);
+    }
+
+    function test_getPrice() external {
+        vm.startPrank(user1);
+        token.approve(address(amm), type(uint256).max);
+        amm.addLiquidity{ value: 1000 ether }(2000 ether);
+        vm.stopPrank();
+
+        uint256 tokenBalance = amm.getReserves();
+        uint256 etherBalance = address(amm).balance;
+       // Eth per tokens
+       assertEq(amm.getPrice(etherBalance, tokenBalance), 500);
+       // Tokens per Eth
+       assertEq(amm.getPrice(tokenBalance, etherBalance), 2000);
     }
 
     /// @dev Test that fuzzes an unsigned integer.

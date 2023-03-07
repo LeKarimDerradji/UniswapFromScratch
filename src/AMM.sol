@@ -44,7 +44,17 @@ contract AMM {
         return (inputReserve * 1000) / outputReserve;
     }
 
-    function getAmount(uint256 inputReserve, uint256 outputReserve) external pure returns (uint256) {
-         if (inputReserve == 0 && outputReserve == 0) revert InvalidReserves();
+    function getAmount(
+        uint256 inputAmount,
+        uint256 inputReserve,
+        uint256 outputReserve
+    )
+        private
+        pure
+        returns (uint256)
+    {
+        if (inputReserve == 0 && outputReserve == 0) revert InvalidReserves();
+        // Delta de X fois Y divisé par X plus delta de X
+        return (inputAmount * outputReserve) / (inputReserve * inputAmount);
     }
 }

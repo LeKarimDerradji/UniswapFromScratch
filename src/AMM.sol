@@ -10,6 +10,7 @@ contract AMM {
     error AddressZero();
     error InvalidReserves();
     error InvalidInputAmount();
+    error InsufficientOutputAmount();
 
     constructor(address tokenAddress_) {
         // check is contract
@@ -30,6 +31,15 @@ contract AMM {
     function addLiquidity(uint256 tokenAmount_) external payable {
         IERC20 token = IERC20(tokenAddress);
         token.transferFrom(msg.sender, address(this), tokenAmount_);
+    }
+
+    function ethToTokenSwap(uint256 _minTokens) external payable {
+        uint256 tokenReserve = getReserve();
+        uint256 tokensBought = getAmount(msg.value, (address(this).balance - msg.value), tokenReserve);
+
+        if (tokensBought >= _minTokens) revert InsufficientOutputAmount();
+
+        IERC20(tokenAddress).transfer(msg.sender, tokensBought);
     }
 
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/

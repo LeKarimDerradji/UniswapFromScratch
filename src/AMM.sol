@@ -27,10 +27,14 @@ contract AMM is ERC20 {
      * @dev this function serves for adding liquidity to the pool either in ether or in tokenAddress
      * @param tokenAmount_ the amount of token to add to the liquidity pool (contract)
      */
-    function addLiquidity(uint256 tokenAmount_) external payable {
+    function addLiquidity(uint256 tokenAmount_) external payable returns (uint256) {
         if (getReserve() == 0) {
             IERC20 token = IERC20(tokenAddress);
             token.transferFrom(msg.sender, address(this), tokenAmount_);
+
+            uint256 liquidity = address(this).balance;
+            _mint(msg.sender, liquidity);
+            return liquidity;
         } else {
             uint256 ethReserve = address(this).balance - msg.value;
             uint256 tokenReserve = getReserve();
@@ -39,6 +43,11 @@ contract AMM is ERC20 {
 
             IERC20 token = IERC20(tokenAddress);
             token.transferFrom(msg.sender, address(this), tokenAmount);
+
+            uint256 liquidity = (totalSupply() * msg.value) / ethReserve;
+            _mint(msg.sender, liquidity);
+
+            return liquidity;
         }
     }
 

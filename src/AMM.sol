@@ -42,6 +42,16 @@ contract AMM {
         IERC20(tokenAddress).transfer(msg.sender, tokensBought);
     }
 
+    function tokenToEthSwap(uint256 _tokensSold, uint256 _minEth) public {
+        uint256 tokenReserve = getReserve();
+        uint256 ethBought = getAmount(_tokensSold, tokenReserve, address(this).balance);
+
+        require(ethBought >= _minEth, "insufficient output amount");
+
+        IERC20(tokenAddress).transferFrom(msg.sender, address(this), _tokensSold);
+        payable(msg.sender).transfer(ethBought);
+    }
+
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
     /*                          GETTERS                           */
     /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/

@@ -67,7 +67,14 @@ contract AMMTest is PRBTest, StdCheats {
         assertEq(amm.getPrice(tokenBalance, etherBalance), 2000);
     }
 
-    function test_getAmountOut() external { }
+    function test_getAmountOut() external {
+        vm.prank(user1);
+        amm.addLiquidity{ value: 1 ether }(2 ether);
+        uint256 ethOut = amm.getEthAmount(2 ether);
+        uint256 tokenOut = amm.getTokenAmount(1 ether);
+        assertEq(ethOut, 999_000_999_000_999);
+        assertEq(tokenOut, 1_998_001_998_001_998);
+    }
 
     /// @dev Test that fuzzes an unsigned integer.
     function testFuzz_Example(uint256 x) external {

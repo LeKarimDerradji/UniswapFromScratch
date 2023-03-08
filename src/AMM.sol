@@ -2,6 +2,7 @@
 pragma solidity >=0.8.19;
 
 import "@openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin-contracts/contracts/utils/math/SafeMath.sol";
 
 contract AMM {
     address public tokenAddress;
@@ -69,7 +70,9 @@ contract AMM {
         returns (uint256)
     {
         if (inputReserve == 0 && outputReserve == 0) revert InvalidReserves();
-        // Delta de X fois Y divisé par X plus delta de X
-        return (inputAmount * outputReserve) / (inputReserve * inputAmount);
+
+        uint256 numerator = inputAmount * outputReserve;
+        uint256 denominator = (inputReserve * 1000) + inputAmount;
+        return numerator / denominator;
     }
 }

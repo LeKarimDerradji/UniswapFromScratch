@@ -2,9 +2,10 @@
 pragma solidity >=0.8.19;
 
 import "@openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin-contracts/contracts/utils/math/SafeMath.sol";
 
-contract AMM {
+contract AMM is ERC20 {
     address public tokenAddress;
 
     error AddressZero();
@@ -12,9 +13,7 @@ contract AMM {
     error InvalidInputAmount();
     error InsufficientOutputAmount();
 
-    constructor(address tokenAddress_) {
-        // check is contract
-        // check is ERC20
+    constructor(address tokenAddress_) ERC20("LuniSwap-V1", "LUNI-V1") {
         if (tokenAddress_ == address(0)) revert AddressZero();
 
         tokenAddress = tokenAddress_;
@@ -29,8 +28,18 @@ contract AMM {
      * @param tokenAmount_ the amount of token to add to the liquidity pool (contract)
      */
     function addLiquidity(uint256 tokenAmount_) external payable {
-        IERC20 token = IERC20(tokenAddress);
-        token.transferFrom(msg.sender, address(this), tokenAmount_);
+        if (getReserve() == 0) {
+            IERC20 token = IERC20(tokenAddress);
+            token.transferFrom(msg.sender, address(this), tokenAmount_);
+        } else {
+            uint256 ethReserve = address(this).balance - msg.value;
+            uint256 tokenReserve = getReserve();
+            uint256 tokenAmount = (msg.value * tokenReserve) / ethReserve;
+            require(tokenAmount_ >= tokenAmount, "insufficient token amount");
+
+            IERC20 token = IERC20(tokenAddress);
+            token.transferFrom(msg.sender, address(this), tokenAmount);
+        }
     }
 
     function ethToTokenSwap(uint256 _minTokens) external payable {

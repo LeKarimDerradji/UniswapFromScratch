@@ -109,8 +109,10 @@ contract AMM is ERC20 {
     {
         if (inputReserve == 0 && outputReserve == 0) revert InvalidReserves();
 
-        uint256 numerator = inputAmount * outputReserve;
-        uint256 denominator = (inputReserve * 1000) + inputAmount;
+        uint256 inputAmountWithFee = inputAmount * 99;
+        uint256 numerator = inputAmountWithFee * outputReserve;
+        uint256 denominator = (inputReserve * 100) + inputAmountWithFee;
+
         return numerator / denominator;
     }
 }

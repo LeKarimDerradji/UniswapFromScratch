@@ -70,6 +70,10 @@ contract AMM is ERC20 {
         payable(msg.sender).transfer(ethBought);
     }
 
+    function removeLiquidity(uint256 amount_) external {
+        _burn(msg.sender, amount_);
+    }
+
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
     /*                          GETTERS                           */
     /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/

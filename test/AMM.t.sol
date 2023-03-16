@@ -55,6 +55,24 @@ contract AMMTest is PRBTest, StdCheats {
         assertEq(token.balanceOf(user1), 2990 ether);
     }
 
+    function test_LPTokens() external {
+        vm.prank(user1);
+        amm.addLiquidity{ value: 1 ether }(2 ether);
+        assertEq(amm.totalSupply(), 1 ether);
+        assertEq(amm.balanceOf(user1), 1 ether);
+    }
+
+    function test_removeLiquidity() external {
+        vm.startPrank(user1);
+        amm.addLiquidity{ value: 1 ether }(2 ether);
+        amm.removeLiquidity(1 ether);
+        vm.stopPrank();
+        assertEq(amm.totalSupply(), 0);
+        assertEq(amm.balanceOf(user1), 0);
+        assertEq(token.balanceOf(user1), 2_999_000_000_000_000_000_000);
+        assertEq(user1.balance, 10000 ether);
+    }
+
     function test_getPrice() external {
         vm.prank(user1);
         amm.addLiquidity{ value: 1000 ether }(2000 ether);
@@ -72,30 +90,30 @@ contract AMMTest is PRBTest, StdCheats {
         amm.addLiquidity{ value: 1 ether }(2 ether);
         uint256 ethOut = amm.getEthAmount(2 ether);
         uint256 tokenOut = amm.getTokenAmount(1 ether);
-        assertEq(ethOut, 999_000_999_000_999);
-        assertEq(tokenOut, 1_998_001_998_001_998);
+        assertEq(ethOut, 497_487_437_185_929_648);
+        assertEq(tokenOut, 994_974_874_371_859_296);
     }
 
     function test_getTokenAmountSlippage() external {
         vm.prank(user1);
         amm.addLiquidity{ value: 1 ether }(2 ether);
         uint256 tokenOut = amm.getTokenAmount(1 ether);
-        assertEq(tokenOut, 1_998_001_998_001_998);
+        assertEq(tokenOut, 994_974_874_371_859_296);
         tokenOut = amm.getTokenAmount(100 ether);
-        assertEq(tokenOut, 181_818_181_818_181_818);
+        assertEq(tokenOut, 1_980_000_000_000_000_000);
         tokenOut = amm.getTokenAmount(1000 ether);
-        assertEq(tokenOut, 1_000_000_000_000_000_000);
+        assertEq(tokenOut, 1_997_981_836_528_758_829);
     }
 
     function test_getEthAmountSlippage() external {
         vm.prank(user1);
         amm.addLiquidity{ value: 1 ether }(2 ether);
         uint256 ethOut = amm.getEthAmount(2 ether);
-        assertEq(ethOut, 999_000_999_000_999);
+        assertEq(ethOut, 497_487_437_185_929_648);
         ethOut = amm.getEthAmount(100 ether);
-        assertEq(ethOut, 47619047619047619);
+        assertEq(ethOut, 980_198_019_801_980_198);
         ethOut = amm.getEthAmount(2000 ether);
-        assertEq(ethOut, 500000000000000000);
+        assertEq(ethOut, 998_990_918_264_379_414);
     }
 
     /// @dev Test that fuzzes an unsigned integer.

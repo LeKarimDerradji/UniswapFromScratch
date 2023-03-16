@@ -71,7 +71,7 @@ contract AMM is ERC20 {
     }
 
     function removeLiquidity(uint256 amount_) external returns (uint256, uint256) {
-        if (amount_ > 0) revert InvalidInputAmount();
+        if (amount_ == 0) revert InvalidInputAmount();
 
         uint256 ethAmount = (address(this).balance * amount_) / totalSupply();
         uint256 tokenAmount = (getReserve() * amount_) / totalSupply();

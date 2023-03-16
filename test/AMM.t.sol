@@ -69,8 +69,8 @@ contract AMMTest is PRBTest, StdCheats {
         vm.stopPrank();
         assertEq(amm.totalSupply(), 0);
         assertEq(amm.balanceOf(user1), 0);
-        assertEq(token.balanceOf(user1), 2_999_000_000_000_000_000_000);
-        assertEq(user1.balance, 10000 ether);
+        assertEq(token.balanceOf(user1), 2999 ether);
+        assertEq(user1.balance, 10_000 ether);
     }
 
     function test_getPrice() external {

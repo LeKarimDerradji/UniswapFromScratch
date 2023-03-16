@@ -9,11 +9,25 @@ contract Factory {
 
     mapping(address tokenAddress => address Exchange) public tokenToExchange;
 
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                          SETTERS                           */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
     function createExchange(address tokenAddress_) external returns (address newExchange) {
         if (tokenAddress_ == address(0)) revert invalidTokenAddress(tokenAddress_);
         if (tokenToExchange[tokenAddress_] != address(0)) revert exchangeAlreadyExists(tokenAddress_);
+
         AMM exchange = new AMM(tokenAddress_);
         tokenToExchange[tokenAddress_] = address(exchange);
+
         return address(exchange);
+    }
+
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                          GETTERS                           */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
+    function getExchange(address tokenAddress_) public view returns (address exchange) {
+        return tokenToExchange[tokenAddress_];
     }
 }

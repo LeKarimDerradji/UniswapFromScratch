@@ -7,6 +7,7 @@ import "@openzeppelin-contracts/contracts/utils/math/SafeMath.sol";
 
 contract AMM is ERC20 {
     address public tokenAddress;
+    address public factoryAddress;
 
     error AddressZero();
     error InvalidReserves();
@@ -17,6 +18,7 @@ contract AMM is ERC20 {
         if (tokenAddress_ == address(0)) revert AddressZero();
 
         tokenAddress = tokenAddress_;
+        factoryAddress = msg.sender;
     }
 
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/

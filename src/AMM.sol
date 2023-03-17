@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.8.19;
 
+interface IFactory {
+    function getExchange(address _tokenAddress) external returns (address);
+}
+
 import "@openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin-contracts/contracts/utils/math/SafeMath.sol";
@@ -13,6 +17,7 @@ contract AMM is ERC20 {
     error InvalidReserves();
     error InvalidInputAmount();
     error InsufficientOutputAmount();
+    error InvalidExchangeAddress();
 
     constructor(address tokenAddress_) ERC20("LuniSwap-V1", "LUNI-V1") {
         if (tokenAddress_ == address(0)) revert AddressZero();
@@ -70,6 +75,11 @@ contract AMM is ERC20 {
 
         IERC20(tokenAddress).transferFrom(msg.sender, address(this), _tokensSold);
         payable(msg.sender).transfer(ethBought);
+    }
+
+    function tokenToTokenSwap(uint256 tokenSold_, uint256 minTokenBought_, address tokenAddress_) external {
+        address exchangeAddress = IFactory(factoryAddress).getExchange(tokenAddress_);
+        if (exchangeAddress == address(this) && exchangeAddress == address(0)) revert InvalidExchangeAddress();
     }
 
     function removeLiquidity(uint256 amount_) external returns (uint256, uint256) {

@@ -5,6 +5,10 @@ interface IFactory {
     function getExchange(address _tokenAddress) external returns (address);
 }
 
+interface IExchange {
+    function ethToTokenSwap(uint256 _minTokens) external payable;
+}
+
 import "@openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin-contracts/contracts/utils/math/SafeMath.sol";
@@ -77,9 +81,16 @@ contract AMM is ERC20 {
         payable(msg.sender).transfer(ethBought);
     }
 
-    function tokenToTokenSwap(uint256 tokenSold_, uint256 minTokenBought_, address tokenAddress_) external {
+    function tokenToTokenSwap(uint256 tokensSold_, uint256 minTokenBought_, address tokenAddress_) external {
         address exchangeAddress = IFactory(factoryAddress).getExchange(tokenAddress_);
         if (exchangeAddress == address(this) && exchangeAddress == address(0)) revert InvalidExchangeAddress();
+
+        uint256 tokenReserve = getReserve();
+        uint256 ethBought = getAmount(tokensSold_, tokenReserve, address(this).balance);
+
+        IERC20(tokenAddress).transferFrom(msg.sender, address(this), tokensSold_);
+
+        IExchange(exchangeAddress).ethToTokenSwap{ value: ethBought }(minTokenBought_);
     }
 
     function removeLiquidity(uint256 amount_) external returns (uint256, uint256) {

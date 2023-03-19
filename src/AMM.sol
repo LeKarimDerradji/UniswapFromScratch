@@ -64,6 +64,20 @@ contract AMM is ERC20 {
         }
     }
 
+    function removeLiquidity(uint256 amount_) external returns (uint256, uint256) {
+        if (amount_ == 0) revert InvalidInputAmount();
+
+        uint256 ethAmount = (address(this).balance * amount_) / totalSupply();
+        uint256 tokenAmount = (getReserve() * amount_) / totalSupply();
+
+        _burn(msg.sender, amount_);
+
+        payable(msg.sender).transfer(ethAmount);
+        IERC20(tokenAddress).transfer(msg.sender, amount_);
+
+        return (ethAmount, tokenAmount);
+    }
+
     function ethToTokenSwap(uint256 _minTokens) external payable {
         ethToToken(_minTokens, msg.sender);
     }
@@ -102,20 +116,6 @@ contract AMM is ERC20 {
         IERC20(tokenAddress).transferFrom(msg.sender, address(this), tokensSold_);
 
         IExchange(exchangeAddress).ethToTokenTransfer{ value: ethBought }(minTokensBought_, msg.sender);
-    }
-
-    function removeLiquidity(uint256 amount_) external returns (uint256, uint256) {
-        if (amount_ == 0) revert InvalidInputAmount();
-
-        uint256 ethAmount = (address(this).balance * amount_) / totalSupply();
-        uint256 tokenAmount = (getReserve() * amount_) / totalSupply();
-
-        _burn(msg.sender, amount_);
-
-        payable(msg.sender).transfer(ethAmount);
-        IERC20(tokenAddress).transfer(msg.sender, amount_);
-
-        return (ethAmount, tokenAmount);
     }
 
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/

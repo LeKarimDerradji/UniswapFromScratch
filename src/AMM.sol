@@ -50,7 +50,7 @@ contract AMM is ERC20 {
             uint256 ethReserve = address(this).balance - msg.value;
             uint256 tokenReserve = getReserve();
             uint256 tokenAmount = (msg.value * tokenReserve) / ethReserve;
-            require(tokenAmount_ >= tokenAmount, "insufficient token amount");
+            if (tokenAmount_ <= tokenAmount) revert InvalidInputAmount();
 
             IERC20 token = IERC20(tokenAddress);
             token.transferFrom(msg.sender, address(this), tokenAmount);
@@ -71,7 +71,7 @@ contract AMM is ERC20 {
         uint256 tokenReserve = getReserve();
         uint256 tokensBought = getAmount(msg.value, address(this).balance - msg.value, tokenReserve);
 
-        if (tokensBought <= _minTokens) revert InsufficientOutputAmount();
+        if (tokensBought < _minTokens) revert InsufficientOutputAmount();
 
         IERC20(tokenAddress).transfer(recipient, tokensBought);
     }
@@ -80,7 +80,7 @@ contract AMM is ERC20 {
         uint256 tokenReserve = getReserve();
         uint256 ethBought = getAmount(_tokensSold, tokenReserve, address(this).balance);
 
-        if (ethBought <= _minEth) revert InsufficientOutputAmount();
+        if (ethBought < _minEth) revert InsufficientOutputAmount();
 
         IERC20(tokenAddress).transferFrom(msg.sender, address(this), _tokensSold);
         payable(msg.sender).transfer(ethBought);

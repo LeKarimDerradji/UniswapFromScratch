@@ -65,6 +65,10 @@ contract AMM is ERC20 {
     function ethToTokenSwap(uint256 _minTokens) external payable {
         ethToToken(_minTokens, msg.sender);
     }
+
+    function ethToTokenTransfer(uint256 _minTokens, address _recipient) external payable {
+        ethToToken(_minTokens, _recipient);
+    }
     // For gas better private || internal
 
     function ethToToken(uint256 _minTokens, address recipient) private {

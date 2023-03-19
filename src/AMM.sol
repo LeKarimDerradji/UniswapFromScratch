@@ -6,7 +6,9 @@ interface IFactory {
 }
 
 interface IExchange {
-    function ethToTokenTransfer(uint256 _minTokens, address recipient) external payable;
+    function ethToTokenSwap(uint256 _minTokens) external payable;
+
+    function ethToTokenTransfer(uint256 _minTokens, address _recipient) external payable;
 }
 
 import "@openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
@@ -50,7 +52,7 @@ contract AMM is ERC20 {
             uint256 ethReserve = address(this).balance - msg.value;
             uint256 tokenReserve = getReserve();
             uint256 tokenAmount = (msg.value * tokenReserve) / ethReserve;
-            if (tokenAmount_ <= tokenAmount) revert InvalidInputAmount();
+            if (tokenAmount_ < tokenAmount) revert InvalidInputAmount();
 
             IERC20 token = IERC20(tokenAddress);
             token.transferFrom(msg.sender, address(this), tokenAmount);

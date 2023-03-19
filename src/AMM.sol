@@ -63,19 +63,24 @@ contract AMM is ERC20 {
     }
 
     function ethToTokenSwap(uint256 _minTokens) external payable {
+        ethToToken(_minTokens, msg.sender);
+    }
+    // For gas better private || internal
+
+    function ethToToken(uint256 _minTokens, address recipient) private {
         uint256 tokenReserve = getReserve();
-        uint256 tokensBought = getAmount(msg.value, (address(this).balance - msg.value), tokenReserve);
+        uint256 tokensBought = getAmount(msg.value, address(this).balance - msg.value, tokenReserve);
 
-        if (tokensBought >= _minTokens) revert InsufficientOutputAmount();
+        if (tokensBought <= _minTokens) revert InsufficientOutputAmount();
 
-        IERC20(tokenAddress).transfer(msg.sender, tokensBought);
+        IERC20(tokenAddress).transfer(recipient, tokensBought);
     }
 
     function tokenToEthSwap(uint256 _tokensSold, uint256 _minEth) public {
         uint256 tokenReserve = getReserve();
         uint256 ethBought = getAmount(_tokensSold, tokenReserve, address(this).balance);
 
-        require(ethBought >= _minEth, "insufficient output amount");
+        if (ethBought <= _minEth) revert InsufficientOutputAmount();
 
         IERC20(tokenAddress).transferFrom(msg.sender, address(this), _tokensSold);
         payable(msg.sender).transfer(ethBought);
